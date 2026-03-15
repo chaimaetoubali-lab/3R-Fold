@@ -1,40 +1,10 @@
 import gzip, os, random, io
 import requests
-from Bio import AlignIO
+from Bio import SeqIO, AlignIO
 from collections import defaultdict
 from datasets import load_dataset, Dataset
 
 random.seed(42)
-
-RFAM_SEED_URL = "ftp://ftp.ebi.ac.uk/pub/databases/Rfam/CURRENT/Rfam.seed.gz"
-SEED_LOCAL = "Rfam.seed.gz"
-
-def download_rfam():
-    if not os.path.exists(SEED_LOCAL):
-        print("Downloading Rfam.seed.gz...")
-        http_url = RFAM_SEED_URL.replace("ftp://", "https://")
-        response = requests.get(http_url, stream=True)
-        with open(SEED_LOCAL, "wb") as f:
-            for chunk in response.iter_content(8192):
-                f.write(chunk)
-
-def parse_rfam():
-    rfam_data = []
-    if os.path.exists(SEED_LOCAL):
-        with gzip.open(SEED_LOCAL, "rb") as handle:
-            with io.TextIOWrapper(handle, encoding="utf-8", errors="ignore") as text_handle:
-                alignments = AlignIO.parse(text_handle, "stockholm")
-                for alignment in alignments:
-                    struct = alignment.column_annotations.get("SS_cons", "")
-                    fam = alignment.annotations.get("RFAM_ACCESSION", "RfamFamily")
-                    for record in alignment:
-                        rfam_data.append({
-                            "id": f"{fam}_{record.id}",
-                            "family": fam,
-                            "sequence": str(record.seq).replace("-", ""),
-                            "structure": struct,
-                        })
-    return rfam_data
 
 def load_external_datasets():
 
@@ -77,17 +47,19 @@ def balance_dataset(all_data, threshold=200):
 
     return Dataset.from_list(balanced)
 
-def build_dataset():
-
-    download_rfam()
-    rfam = parse_rfam()
-
+def build_dataset(remove_rfam=True):
     external = load_external_datasets()
+    all_data = external
 
-    all_data = external + rfam
+    dataset = balance_dataset(all_data, threshold=200)
 
-    dataset = balance_dataset(all_data)
+    print("Before filtering:", len(dataset))
+    print("Families before:", sorted(set(dataset["family"])))
 
-    print(dataset)
+    if remove_rfam:
+        dataset = dataset.filter(lambda x: x["family"] != "RfamFamily")
+
+    print("After filtering:", len(dataset))
+    print("Families after:", sorted(set(dataset["family"])))
 
     return dataset
