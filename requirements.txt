@@ -1,0 +1,51 @@
+torch
+transformers
+faiss-cpu
+faiss-gpu
+biopython
+viennarna
+datasets
+scikit-learn
+tqdm
+rna-fm
+
+# Deep Learning
+
+torch>=2.0
+torchvision
+
+# HuggingFace datasets
+
+datasets>=2.16
+huggingface-hub
+
+# Bioinformatics
+
+biopython>=1.81
+viennarna>=2.6
+
+# Scientific computing
+
+numpy>=1.23
+scipy>=1.10
+pandas>=1.5
+scikit-learn>=1.3
+
+# Visualization
+
+matplotlib>=3.7
+seaborn>=0.12
+
+# Dimensionality reduction
+
+umap-learn>=0.5
+
+# Utilities
+
+tqdm>=4.66
+requests>=2.31
+pyyaml>=6.0
+
+# For RNA-FM model
+fair-esm
+biotite

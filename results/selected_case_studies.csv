@@ -1,0 +1,4 @@
+query_id,f1_baseline,family,length,f1_method,neighbor_families,gain,case_type
+5S_rRNA-Bacteria-B00731,0.2162162162162162,5S_rRNA,120,0.8985507246376813,5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA|5S_rRNA,0.682334508421465,best_improvement
+SRP-long_bacterial-Clos.ther._CP000568,0.08,SRP,175,0.081081081081081,RfamFamily|RfamFamily|RfamFamily|SRP|SRP|SRP|RfamFamily|SRP|SRP|RfamFamily|SRP|SRP|SRP|RfamFamily,0.0010810810810810006,typical_case
+tRNA-tdbD00009470,1.0,tRNA,74,0.0,tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA|tRNA,-1.0,worst_case
