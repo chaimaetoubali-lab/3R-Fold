@@ -1,11 +1,9 @@
 torch
 transformers
 faiss-cpu
-faiss-gpu
 biopython
 viennarna
 datasets
-scikit-learn
 tqdm
 rna-fm
 
@@ -48,4 +46,3 @@ pyyaml>=6.0
 
 # For RNA-FM model
 fair-esm
-biotite
