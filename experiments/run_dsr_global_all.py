@@ -1,6 +1,8 @@
 import sys
 import os
 
+from evaluation.benchmark import split_dataset
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(PROJECT_ROOT)
 
@@ -31,7 +33,7 @@ def retrieve_neighbors_from_global_dsr(Z, dataset, query_idx, k=14):
     return neighbors, neighbor_families, vals.tolist(), neighbor_indices
 
 
-def main():
+def main(seed=42, n_queries=50,test_fraction=0.2):
     results_dir = os.path.join(PROJECT_ROOT, "results")
     os.makedirs(results_dir, exist_ok=True)
 
@@ -86,13 +88,19 @@ def main():
 
     rows = []
 
-    n_queries = len(dataset)
+    kb_data, test_data = split_dataset(dataset, test_fraction=test_fraction, seed=seed)
+
+    if n_queries is not None:
+        test_data = test_data[:n_queries]
+
+
+    n_queries = len(test_data)
 
     for i in range(n_queries):
         if (i + 1) % 100 == 0 or i == 0:
             print(f"Evaluating query {i+1}/{n_queries}")
 
-        query = dataset[i]
+        query = test_data[i]
 
         neighbors, fams, vals, neighbor_indices = retrieve_neighbors_from_global_dsr(
             dsr.Z,
