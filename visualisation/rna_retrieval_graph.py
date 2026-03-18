@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 
 def plot_rna_retrieval_graph(Z, families, n=200, k=5):
@@ -28,7 +29,10 @@ def plot_rna_retrieval_graph(Z, families, n=200, k=5):
     family_to_color = {fam: idx for idx, fam in enumerate(unique_families)}
     node_colors = [family_to_color[f] for f in node_families]
 
-    pos = nx.spring_layout(G, seed=42)
+    config = yaml.safe_load(open("config/default.yaml"))
+    seed = config.get("seed", 42)
+
+    pos = nx.spring_layout(G, seed=seed)
 
     plt.figure(figsize=(8, 8))
     nx.draw_networkx_nodes(

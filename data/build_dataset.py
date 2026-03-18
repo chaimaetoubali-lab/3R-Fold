@@ -1,10 +1,13 @@
 import gzip, os, random, io
 import requests
+import yaml
 from Bio import SeqIO, AlignIO
 from collections import defaultdict
 from datasets import load_dataset, Dataset
 
-random.seed(42)
+
+config = yaml.safe_load(open("config/default.yaml"))
+random.seed(config.get("seed", 42))
 
 def load_external_datasets():
 
