@@ -1,5 +1,7 @@
 import torch
 from fm import pretrained
+import os
+os.getcwd()
 
 
 class PretrainedRNAEmbedder:

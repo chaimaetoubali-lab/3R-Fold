@@ -1,6 +1,8 @@
 import sys
 import os
 
+from evaluation.benchmark import split_dataset
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(PROJECT_ROOT)
 
@@ -16,7 +18,7 @@ from evaluation.metrics import evaluate_structure
 from retrieval.retrieval_guided_fold import fold_with_neighbor_guidance
 
 
-def main():
+def main(seed=42, n_queries=50,test_fraction=0.2):
     results_dir = os.path.join(PROJECT_ROOT, "results")
     os.makedirs(results_dir, exist_ok=True)
 
@@ -68,10 +70,14 @@ def main():
     index.build(latent)
 
     rows = []
+    kb_data, test_data = split_dataset(dataset, test_fraction=test_fraction, seed=seed)
 
-    for i, query in enumerate(dataset):
+    if n_queries is not None:
+        test_data = test_data[:n_queries]
+
+    for i, query in enumerate(test_data):
         if i == 0 or (i + 1) % 100 == 0:
-            print(f"Evaluating query {i+1}/{len(dataset)}")
+            print(f"Evaluating query {i+1}/{len(test_data)}")
 
         query_embedding = latent[i].unsqueeze(0)
 

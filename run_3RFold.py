@@ -102,4 +102,3 @@ def main(config_path="config/default.yaml"):
 
 if __name__ == "__main__":
     main("config/default.yaml")
-#python run_3RFold.py --config config/default.yaml

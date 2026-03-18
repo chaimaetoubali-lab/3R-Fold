@@ -1,28 +1,23 @@
-# 3R-Fold: RNA Secondary Structure Prediction with Retrieval
+# 3R-Fold: Retrieval-Augmented RNA Secondary Structure Prediction via Deep Self-Representation and RNA Foundation Models
 
-A comprehensive framework for RNA secondary structure prediction using retrieval-guided folding with Deep Self Representation (DSR) and FAISS-based similarity search.
-
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Overview](#overview)
 2. [System Requirements](#system-requirements)
 3. [Installation](#installation)
 4. [Configuration](#configuration)
 5. [Running the Project](#running-the-project)
-6. [Google Colab Setup](#google-colab-setup)
 7. [Local Machine Setup](#local-machine-setup)
-8. [Jupyter Notebook Usage](#jupyter-notebook-usage)
+6. [Google Colab Setup](#google-colab-setup)
+8. [Advanced Configuration](#advanced-configuration)
 9. [Troubleshooting](#troubleshooting)
+10. [Expected Results](#expected-results)
 
-## 🎯 Overview
+## Overview
 
-3R-Fold implements a novel approach to RNA secondary structure prediction that uses self representation to find top-k similarities. This code is used to perform benchmarking with the following methods:
-- **RNA-FM**: Pre-trained RNA language model for embeddings
-- **FAISS**: Efficient similarity search for retrieval
-- **DSR**: Deep Self Representation for improved retrieval
-- **Retrieval-Guided Folding**: Using neighbor structures to improve predictions
+3R-Fold is a retrieval-augmented framework for RNA secondary structure prediction that integrates RNA foundation model embeddings with representation learning and structural similarity search. In the first stage, RNA sequences are encoded using RNA-FM together with a Deep Self-Representation (DSR) model to learn structure-aware embeddings capturing global relationships between RNA sequences. In the second stage, FAISS similarity search retrieves structurally related RNAs from a knowledge base, and their secondary structures are aggregated to produce a consensus structural signal that guides folding prediction. Experiments across multiple RNA families and sequence lengths show that retrieval-based guidance substantially improves prediction accuracy compared with classical thermodynamic folding. The proposed 3R-Fold framework achieves the strongest overall performance among evaluated approaches and does not require prior knowledge of RNA family annotations. More broadly, 3R-Fold can be viewed as a modular retrieval layer that augment existing RNA folding algorithms and provides a promising direction toward scalable, data-driven RNA structure prediction
 
-## 💻 System Requirements
+## System Requirements
 
 ### Minimum Requirements
 - Python 3.8+
@@ -35,7 +30,7 @@ A comprehensive framework for RNA secondary structure prediction using retrieval
 - NVIDIA GPU with 8GB+ VRAM
 - 50GB+ free disk space
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -61,16 +56,18 @@ source 3rfold_env/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-## ⚙️ Configuration
+##  Configuration
 
 ### 1. Global Path Configuration
 
-The project uses a centralized path configuration system. Edit `config/paths.py`:
+If you will run this code outside the project folder make sure to change the project Path. 
+
+The configuration file is `config/paths.py` :
 
 ```python
 # Set your base path
-BASE_PATH = "/path/to/your/project"  # Full path to your python code
-# BASE_PATH = "./"  # Relative project path
+BASE_PATH = "./"  # Relative project path
+# BASE_PATH = "/path/to/your/project"  # Full path to your python code
 # BASE_PATH = "/content/drive/MyDrive/" + "/path/to/your/project"  # Google Colab
 
 # Or use environment variable
@@ -105,24 +102,19 @@ folding:
   unpaired_bonus: 0.3
 ```
 
-## 🏃‍♂️ Running the Project
+## ️Running The Project
 
 ### Option 1: Jupyter Notebook (Recommended)
 ```bash
-jupyter notebook 3RFold_NB.ipynb
+jupyter notebook Main_Runner.ipynb
 ```
 
 ### Option 2: Command Line
-```bash
-# Run main pipeline
-python run_3RFold.py
-
-# Run individual components
-python experiments/run_benchmark.py
-python experiments/run_embedding_umap.py
-```
+Convert `Main_Runner.ipynb` to `Main_Runner.py` and run it.
 
 ### Option 3: Individual Scripts
+
+For each cell in the notebook, run the corresponding script as follows
 ```bash
 # Build dataset
 python -c "from data.build_dataset import build_dataset; build_dataset()"
@@ -140,47 +132,7 @@ build_kb(dataset, embedder, cache_path=f'{get_results_path()}/embeddings.pt')
 "
 ```
 
-## 📊 Google Colab Setup
-
-### 1. Mount Google Drive
-```python
-from google.colab import drive
-drive.mount('/content/drive')
-```
-
-### 2. Setup Environment
-```python
-# Install dependencies
-!pip install torch torchvision torchaudio
-!pip install fair-esm biotite
-!pip install faiss-cpu
-!pip install umap-learn seaborn tqdm pandas matplotlib
-
-# Clone repository (if not already done)
-!git clone <repository-url>
-%cd 3R-Fold
-```
-
-### 3. Configure Paths
-```python
-# The config should already be set for Colab
-# Verify in config/paths.py:
-# BASE_PATH = "/content/drive/MyDrive/Foldv"
-```
-
-### 4. Run in Colab
-```python
-# Run the notebook
-%run 3RFold_NB.ipynb
-
-# Or execute individual cells
-import sys
-sys.path.append('.')
-from run_3RFold import main
-main()
-```
-
-## 🖥️ Local Machine Setup
+## Local Machine Setup
 
 ### 1. Environment Setup
 ```bash
@@ -193,106 +145,28 @@ python -m venv venv
 source venv/bin/activate
 
 # Clone and install
-git clone <repository-url> .
+git clone "https://github.com/chaimaetoubali-lab/3R-Fold" .
 pip install -r requirements.txt
 ```
 
-### 2. Data Preparation
-```bash
-# Create necessary directories
-mkdir -p data results results/plots models
+## Google Colab Setup
 
-# Download Rfam database (automatic)
-python -c "from data.build_dataset import download_rfam; download_rfam()"
-
-# Or manually download
-wget ftp://ftp.ebi.ac.uk/pub/databases/Rfam/CURRENT/Rfam.seed.gz
-gunzip Rfam.seed.gz
-```
-
-### 3. GPU Setup (Optional but Recommended)
-```bash
-# Check CUDA availability
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-
-# Set CUDA device
-export CUDA_VISIBLE_DEVICES=0
-```
-
-## 📓 Jupyter Notebook Usage
-
-### Opening the Notebook
-```bash
-# From project root
-jupyter notebook 3RFold_NB.ipynb
-
-# Or with specific IP/port
-jupyter notebook --ip=0.0.0.0 --port=8888 3RFold_NB.ipynb
-```
-
-### Notebook Structure
-The notebook `3RFold_NB.ipynb` contains:
-
-1. **Setup Cell**: Imports and configuration
-2. **Data Loading**: Dataset preparation and embedding
-3. **Model Training**: DSR training (optional)
-4. **Retrieval**: FAISS index building and search
-5. **Evaluation**: Benchmark and metrics
-6. **Visualization**: Results plotting and analysis
-
-### Running Specific Cells
-
-#### Cell-by-Cell Execution:
+### 1. Mount Google Drive
+### 2. Setup Environment
 ```python
-# Cell 1: Setup
-import sys
-import os
-sys.path.append('.')
-from config import get_base_path, get_results_path, get_plots_path
+# Install dependencies
+!pip install -r requirements.txt
 
-# Cell 2: Data Loading
-from data.build_dataset import build_dataset
-dataset = build_dataset()
-print(f"Dataset size: {len(dataset)}")
-
-# Cell 3: Embeddings
-from models.pretrained_embedder import PretrainedRNAEmbedder
-from retrieval.build_kb import build_kb
-
-embedder = PretrainedRNAEmbedder(device='cuda' if torch.cuda.is_available() else 'cpu')
-embeddings = build_kb(dataset, embedder)
+# Clone repository (if not already done)
+!git clone "https://github.com/chaimaetoubali-lab/3R-Fold"
+%cd 3R-Fold
 ```
 
-#### Full Execution:
-```python
-# Run all cells sequentially
-# Kernel → Restart & Run All
+### 3. Run in Colab
+Run the notebook
 
-# Or use command line
-jupyter nbconvert --to python 3RFold_NB.ipynb
-python 3RFold_NB.py
-```
 
-### Custom Configuration in Notebook
-```python
-# Override default config
-import yaml
-
-custom_config = {
-    'retrieval': {'top_k': 10},
-    'training': {'epochs': 100},
-    'folding': {'bonus': 2.0}
-}
-
-# Save custom config
-with open('configs/custom.yaml', 'w') as f:
-    yaml.dump(custom_config, f)
-
-# Use custom config
-main('configs/custom.yaml')
-```
-
-## 🔧 Advanced Configuration
+## Advanced Configuration
 
 ### GPU Memory Management
 ```python
@@ -328,7 +202,7 @@ print(f"Results: {get_results_path()}")
 print(f"Plots: {get_plots_path()}")
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -361,19 +235,6 @@ pip install faiss-gpu
 python -c "import faiss; print(faiss.__version__)"
 ```
 
-#### 4. Dataset Download Issues
-```python
-# Manual download alternative
-import requests
-from io import BytesIO
-import gzip
-
-url = "ftp://ftp.ebi.ac.uk/pub/databases/Rfam/CURRENT/Rfam.seed.gz"
-response = requests.get(url.replace('ftp://', 'https://'))
-with open('Rfam.seed.gz', 'wb') as f:
-    f.write(response.content)
-```
-
 ### Performance Optimization
 
 #### Memory Usage
@@ -388,15 +249,7 @@ def process_in_chunks(data, chunk_size=1000):
         yield data[i:i+chunk_size]
 ```
 
-#### Speed Optimization
-```python
-# Use multiprocessing for embedding
-from multiprocessing import Pool
-with Pool(processes=4) as p:
-    results = p.map(embed_sequences, sequence_chunks)
-```
-
-## 📊 Expected Results
+##  Expected Results
 
 ### Output Files
 - **Results**: `results/*.csv` - Benchmark metrics and comparisons
@@ -409,39 +262,3 @@ with Pool(processes=4) as p:
 - **Sensitivity**: True positive rate
 - **PPV**: Positive predictive value
 - **Runtime**: Computational efficiency
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch
-3. Make changes with tests
-4. Submit pull request
-
-## 📄 License
-
-[Add your license information here]
-
-## 📞 Support
-
-For issues and questions:
-- Create GitHub issue
-- Check troubleshooting section
-- Review configuration examples
-
----
-
-**Quick Start Commands:**
-
-```bash
-# Google Colab
-1. Open Colab
-2. Mount Drive: `from google.colab import drive; drive.mount('/content/drive')`
-3. Run: `%run 3RFold_NB.ipynb`
-
-# Local Machine
-1. Clone repo
-2. Setup environment: `python -m venv venv && source venv/bin/activate`
-3. Install: `pip install -r requirements.txt`
-4. Configure: Edit `config/paths.py`
-5. Run: `jupyter notebook 3RFold_NB.ipynb`
-```
